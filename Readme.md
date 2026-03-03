@@ -53,7 +53,7 @@ A Python toolkit for encrypting, decrypting, and analyzing classical and modern 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/xyz/CTF-toolkit.git
+git clone https://github.com/Devarsh-a/CTF-toolkit.git
 cd CTF-toolkit
 ```
 
