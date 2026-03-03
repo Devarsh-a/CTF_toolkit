@@ -61,16 +61,18 @@ cd CTF-toolkit
 
 2. Create a virtual environment (optional but recommended):
 
+```bash
 python -m venv .venv
 source .venv/bin/activate   # Linux / macOS
 .venv\Scripts\activate      # Windows
+```
 
 ## Install dependencies:
 
 3. install dependencies
-
+```bash
 pip install -r requirements.txt
-
+```
 
 ## Command-Line Usage
 4. usage 
