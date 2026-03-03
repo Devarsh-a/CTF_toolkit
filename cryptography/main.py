@@ -1,7 +1,7 @@
 # main.py
 
 import sys
-from cryptography.engine import encrypt, decrypt, analyze
+from engine import encrypt, decrypt, analyze
 
 
 def print_usage():
