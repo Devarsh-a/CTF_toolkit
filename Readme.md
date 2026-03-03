@@ -50,7 +50,7 @@ A Python toolkit for encrypting, decrypting, and analyzing classical and modern 
 
 ## Installation
 
-1. Clone the repository:
+Clone the repository:
 
 ```bash
 git clone https://github.com/Devarsh-a/CTF-toolkit.git
@@ -59,7 +59,7 @@ cd CTF-toolkit
 
 ## Make a Virtual environment
 
-2. Create a virtual environment (optional but recommended):
+Create a virtual environment (optional but recommended):
 
 ```bash
 python -m venv .venv
@@ -69,13 +69,13 @@ source .venv/bin/activate   # Linux / macOS
 
 ## Install dependencies:
 
-3. install dependencies
+install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
 ## Command-Line Usage
-4. usage 
+usage 
 
 The toolkit also provides a simple command-line interface (CLI) to interact with ciphers and the analysis engine.
 
