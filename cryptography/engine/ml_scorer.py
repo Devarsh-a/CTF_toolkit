@@ -14,7 +14,7 @@ ENGLISH_FREQ = {
     'Q': 0.10, 'Z': 0.07
 }
 
-COMMON_WORDS = ["the", "and", "that", "have", "for", "with", "flag", "http", "https"]
+COMMON_WORDS = ["the", "and", "that", "have", "for", "with", "flag", "http", "https","kaalchakra","nfsu"]
 
 class PlaintextScorer:
     """Combine heuristics and statistics into a single plaintext score."""
@@ -34,27 +34,23 @@ class PlaintextScorer:
                 return 0.0
 
         score = 0.0
-
-        # ------------------------
-        # 1️⃣ Printable ratio
-        # ------------------------
+        # 
+        # 1️ Printable ratio
+        # 
         score += is_mostly_printable(data) * 1.0
-
-        # ------------------------
-        # 2️⃣ Shannon entropy
-        # ------------------------
+        # 
+        # 2️ Shannon entropy
+        # 
         entropy_val = shannon_entropy(data.encode())
         score += 1 - abs(entropy_val - 4.2) / 4.2  # English ≈ 3.5–4.5
-
-        # ------------------------
-        # 3️⃣ Alphabetic & space ratios
-        # ------------------------
+        # 
+        # 3️ Alphabetic & space ratios
+        # 
         score += alphabetic_ratio(data)
         score += space_ratio(data)
-
-        # ------------------------
-        # 4️⃣ English letter frequency match
-        # ------------------------
+        # 
+        # 4️ English letter frequency match
+        # 
         letters = [c.upper() for c in data if c in string.ascii_letters]
         if letters:
             freq = Counter(letters)
@@ -65,10 +61,9 @@ class PlaintextScorer:
                 expected = ENGLISH_FREQ[letter]
                 freq_score += 1 - abs(observed - expected) / expected
             score += freq_score / len(ENGLISH_FREQ)
-
-        # ------------------------
-        # 5️⃣ Common word bonus
-        # ------------------------
+        # 
+        # 5️ Common word bonus
+        # 
         lower = data.lower()
         for word in COMMON_WORDS:
             if word in lower:

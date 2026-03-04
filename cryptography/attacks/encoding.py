@@ -40,6 +40,17 @@ def try_base16(data: str):
     except:
         return None
 
+def try_base16_file(data: str):
+    try:
+        # Remove all whitespace (spaces, newlines, tabs)
+        cleaned = "".join(data.split())
+        # If odd length, prepend a zero
+        if len(cleaned) % 2:
+            cleaned = "0" + cleaned
+        decoded = binascii.unhexlify(cleaned)
+        return decoded, "base16_file"
+    except:
+        return None
 
 def try_base32(data: str):
     try:
@@ -111,9 +122,43 @@ def try_octal(data: str):
     except:
         pass
     return None
+def try_rotx(data: str, shifts=None):
+    """
+    Attempt all ROT-X shifts on printable ASCII.
+    Returns a list of tuples (decoded_bytes, encoding_type)
+    """
+    if shifts is None:
+        # Try all shifts from 1 to 94
+        shifts = range(1, 95)
+
+    results = []
+    for shift in shifts:
+        try:
+            decoded = []
+            for c in data:
+                ascii_val = ord(c)
+                if 33 <= ascii_val <= 126:  # printable ASCII
+                    decoded_val = 33 + ((ascii_val - 33 + shift) % 94)
+                    decoded.append(chr(decoded_val))
+                else:
+                    decoded.append(c)
+            decoded_bytes = "".join(decoded).encode()
+            results.append((decoded_bytes, f"rot{shift}"))
+        except:
+            continue
+    return results if results else None
+def try_rotx_wrapper(data: str):
+    results = try_rotx(data, shifts=range(1, 95))
+    # For beam search, just return the first result (can be pruned later)
+    if results:
+        # Only return the first result here, recursive decoder will explore all depths
+        return results[0]
+    return None
 
 
 TEXT_ATTEMPTS = [
+    try_rotx_wrapper,
+    try_base16_file,
     try_base16,
     try_base32,
     try_base64,
@@ -180,15 +225,15 @@ COMPRESSION_ATTEMPTS = [
 
 def recursive_decode(
     data,
-    max_depth=3,
+    max_depth=5,  # allow deeper recursion for nested encodings
     stop_on_printable=False,
     scorer=None,
     beam_width=25
 ):
     """
-    ML-guided beam search recursive decoder.
+    Robust recursive decoder with beam search.
+    Supports messy hex files, base encodings, and compression.
     """
-
     if isinstance(data, str):
         initial_bytes = data.encode(errors="ignore")
     elif isinstance(data, bytes):
@@ -203,14 +248,11 @@ def recursive_decode(
     current_level = [(initial_bytes, None, 1)]
 
     for depth in range(1, max_depth + 1):
-
         next_level = []
 
         for current_bytes, parent_result, depth in current_level:
-
             if current_bytes in visited:
                 continue
-
             visited.add(current_bytes)
 
             # ---------------------
@@ -218,20 +260,16 @@ def recursive_decode(
             # ---------------------
             for comp in COMPRESSION_ATTEMPTS:
                 outcome = comp(current_bytes)
-                if not outcome:
-                    continue
-
-                decoded_bytes, enc_type = outcome
-
-                result = EncodingResult(
-                    decoded=decoded_bytes,
-                    encoding_type=enc_type,
-                    parent=None,
-                    depth=depth
-                )
-
-                results.append(result)
-                next_level.append((decoded_bytes, result, depth))
+                if outcome:
+                    decoded_bytes, enc_type = outcome
+                    result = EncodingResult(
+                        decoded=decoded_bytes,
+                        encoding_type=enc_type,
+                        parent=parent_result,
+                        depth=depth
+                    )
+                    results.append(result)
+                    next_level.append((decoded_bytes, result, depth + 1))
 
             # ---------------------
             # Text encoding attempts
@@ -243,40 +281,32 @@ def recursive_decode(
 
             for attempt in TEXT_ATTEMPTS:
                 outcome = attempt(current_text)
-                if not outcome:
-                    continue
+                if outcome:
+                    decoded_bytes, enc_type = outcome
+                    result = EncodingResult(
+                        decoded=decoded_bytes,
+                        encoding_type=enc_type,
+                        parent=parent_result,
+                        depth=depth
+                    )
+                    results.append(result)
+                    next_level.append((decoded_bytes, result, depth + 1))
 
-                decoded_bytes, enc_type = outcome
-
-                result = EncodingResult(
-                    decoded=decoded_bytes,
-                    encoding_type=enc_type,
-                    parent=parent_result,
-                    depth=depth
-                )
-
-                results.append(result)
-                next_level.append((decoded_bytes, result, depth + 1))
-
-        # 🔥 BEAM PRUNING
+        #  Beam pruning
         if scorer:
             next_level = sorted(
                 next_level,
-                key=lambda x: scorer(
-                    x[0].decode(errors="ignore")
-                ),
+                key=lambda x: scorer(x[0].decode(errors="ignore")),
                 reverse=True
             )[:beam_width]
         else:
             next_level = next_level[:beam_width]
 
         current_level = next_level
-
         if not current_level:
             break
 
     return results
-
 # ==========================================================
 # Utility
 # ==========================================================

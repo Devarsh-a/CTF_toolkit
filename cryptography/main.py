@@ -73,7 +73,7 @@ def main():
             if not results:
                 print("No decoding candidates found.")
                 return
-
+           
             best = results[0]
 
             decoded_text = best.decoded.decode(errors="ignore")
