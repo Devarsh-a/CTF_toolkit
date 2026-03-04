@@ -11,7 +11,7 @@ It includes encryption/decryption tools, automated cipher breaking, encoding/dec
 
 ---
 
-## CTF Cryptography Toolkit
+# Cryptography Toolkit
 
 A Python toolkit for encrypting, decrypting, and analyzing classical and modern ciphers. Includes ML-guided cryptanalysis for automated breaking of some ciphers.
 
@@ -54,7 +54,7 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/Devarsh-a/CTF-toolkit.git
-cd CTF-toolkit
+cd CTF-toolkit/cryptography
 ```
 
 ## Make a Virtual environment
@@ -131,5 +131,58 @@ Some cipher-breaking functions (like Vigenère) assume ASCII plaintext.
 Modern ciphers (AES, RC4) are not brute-forceable with the current engine.
 
 Designed as a general CTF toolkit for cryptography, forensics, reverse engineering, and web exploitation challenges.
+
+
+# Forensics Toolkit 
+
+## Network Forensics 
+
+```bash
+
+cd CTF-toolkit/forensics/network
+```
+### Requrements 
+
+```bash
+cd ..
+pip install -r requirments.txt
+
+```
+
+### usage
+
+add the .pac file in the directory and then run the network_capture.py file
+
+``` bash
+python network_capture.py
+```
+output shall be stored in the "foresics_output" folder
+
+
+
+
+
+## Stegnography Toolkit
+```bash
+cd CTF_toolkit/forensics/stegnography 
+```
+
+### Requirnments 
+
+``` bash
+cd ../
+pip install -r requirnments.txt
+```
+
+### usage 
+add the input files in the folder "stegno_files"
+
+and then 
+
+```bash 
+python main.py
+```
+
+the output shall be stored in the "stego_output" folder
 
 
