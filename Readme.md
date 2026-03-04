@@ -4,8 +4,7 @@ This is a general-purpose CTF toolkit designed to **generalize scripts** commonl
 
 - **Forensics**
 - **Cryptography**
-- **Reverse Engineering**
-- **Web Exploitation**
+
 
 It includes encryption/decryption tools, automated cipher breaking, encoding/decoding utilities, and ML-guided plaintext scoring for analysis.
 
